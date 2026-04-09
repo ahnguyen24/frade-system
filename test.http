@@ -1,0 +1,110 @@
+### Cấu hình biến
+@baseUrl = http://127.0.0.1:5000
+
+# ==========================================================
+# NHÓM 1: GIAO DỊCH BÌNH THƯỜNG (EXPECTED: ALLOW)
+# ==========================================================
+
+### Case 1: Giao dịch phổ thông
+# Số tiền nhỏ, tại địa điểm quen thuộc, thiết bị cũ.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 200,
+    "freq_24h": 1,
+    "distance_from_last": 0.5,
+    "is_new_device": 0
+}
+
+### Case 2: Mua sắm cuối tuần
+# Số tiền trung bình, tần suất hơi cao nhưng vẫn trong ngưỡng bình thường.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 850,
+    "freq_24h": 4,
+    "distance_from_last": 5.0,
+    "is_new_device": 0
+}
+
+# ==========================================================
+# NHÓM 2: GIAO DỊCH NGHI VẤN (EXPECTED: CHALLENGE_MFA)
+# ==========================================================
+
+### Case 3: Du lịch hoặc công tác (Impossible Travel nhẹ)
+# Khoảng cách xa (100km) nhưng số tiền và thiết bị không đổi.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 1200,
+    "freq_24h": 2,
+    "distance_from_last": 100.0,
+    "is_new_device": 0
+}
+
+### Case 4: Mua sắm trên thiết bị mới
+# Giao dịch lần đầu trên điện thoại mới, cần xác thực bổ sung.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 500,
+    "freq_24h": 1,
+    "distance_from_last": 2.0,
+    "is_new_device": 1
+}
+
+### Case 5: Tần suất giao dịch tăng đột biến
+# Số tiền nhỏ nhưng thực hiện liên tục nhiều lần trong ngày.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 50,
+    "freq_24h": 12,
+    "distance_from_last": 1.0,
+    "is_new_device": 0
+}
+
+# ==========================================================
+# NHÓM 3: GIAO DỊCH RỦI RO CAO (EXPECTED: BLOCK)
+# ==========================================================
+
+### Case 6: Tấn công "Impossible Travel" (Xâm nhập tài khoản)
+# Vừa giao dịch ở Hà Nội, 5 phút sau giao dịch ở TP.HCM (1200km).
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 5000,
+    "freq_24h": 2,
+    "distance_from_last": 1200.0,
+    "is_new_device": 1
+}
+
+### Case 7: Tấn công vét cạn tài khoản (Brute Force/Velocity)
+# Rút tiền liên tục với số lượng lớn trong thời gian ngắn.
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 15000,
+    "freq_24h": 45,
+    "distance_from_last": 0.0,
+    "is_new_device": 1
+}
+
+### Case 8: Giao dịch số tiền cực lớn bất thường
+# Vượt xa mức chi tiêu trung bình (Outlier về Monetary).
+POST {{baseUrl}}/analyze-transaction
+Content-Type: application/json
+
+{
+    "amount": 95000,
+    "freq_24h": 1,
+    "distance_from_last": 5.0,
+    "is_new_device": 1
+}

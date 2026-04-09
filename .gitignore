@@ -1,0 +1,28 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# === IDEs ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === FRADE Project Specific ===
+# Không đẩy dữ liệu giao dịch mẫu lên để bảo mật
+data/transactions.csv
+
+# Không đẩy các file mô hình đã train (thường rất nặng và nên được quản lý riêng)
+models/*.pkl
+models/*.joblib
+
+# Không đẩy file nhật ký (logs)
+*.log
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
