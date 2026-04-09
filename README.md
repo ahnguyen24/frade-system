@@ -28,6 +28,7 @@ FRADE_SYSTEM/
 ├── app.py              # Main API Gateway (Flask)
 ├── train_pipeline.py   # Automated training pipeline
 └── test.http           # Comprehensive test cases for REST Client
+```
 
 ---
 
