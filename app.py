@@ -10,23 +10,42 @@ detector = FraudDetector()
 def analyze():
     data = request.json
     
-    # 1. Trích xuất đặc trưng
+    # 1. Extract Features
     amt = data.get('amount', 0)
     dist = data.get('distance_from_last', 0)
     freq = data.get('freq_24h', 1)
     dev = data.get('is_new_device', 0)
     
-    # 2. Lớp Luật cứng (Hard Rules) - Chặn ngay lập tức nếu vi phạm nghiêm trọng
-    if dist > 1000 and dev == 1: # Impossible Travel + Thiết bị lạ
-        return jsonify({"action": "BLOCK", "message": "Phát hiện xâm nhập trái phép (Location)", "code": 403})
-    
-    if freq > 40: # Tần suất quá khủng khiếp
-        return jsonify({"action": "BLOCK", "message": "Phát hiện tấn công vét cạn", "code": 403})
-
-    # 3. Lớp AI (Nếu không vi phạm luật cứng thì mới hỏi AI)
     features = [amt, freq, dist, dev]
+
+    # 2. ALWAYS calculate risk score first to ensure it's displayed
     risk_score = detector.predict_risk(features)
+    risk_score_rounded = round(float(risk_score), 4)
+
+    # 3. Hard Rules (Now checking after scoring, or using score in response)
+    # Impossible Travel Rule
+    if dist > 1000 and dev == 1:
+        return jsonify({
+            "action": "BLOCK",
+            "message": "Security Alert: Impossible Travel Detected",
+            "code": 403,
+            "risk_score": risk_score_rounded
+        })
+    
+    # High Velocity Rule
+    if freq > 40:
+        return jsonify({
+            "action": "BLOCK",
+            "message": "Security Alert: Excessive Transaction Velocity",
+            "code": 403,
+            "risk_score": risk_score_rounded
+        })
+
+    # 4. AI-based Decision (If hard rules didn't trigger)
     decision = evaluate_action(risk_score)
+    
+    # Ensure all AI responses also include the score and English messages
+    decision['risk_score'] = risk_score_rounded
     
     return jsonify(decision)
 
