@@ -1,0 +1,25 @@
+<div class="card p-4 text-center mx-auto mt-5" style="max-width: 400px;">
+    <h4>🔐 Xác thực giao dịch</h4>
+    <p>Một mã OTP đã được gửi đến số: <b>{{ phone }}</b></p>
+    <div class="alert alert-warning">Giao dịch sẽ tự hủy sau: <span id="timer">02:00</span></div>
+    <form action="/mfa-confirm/{{ tx.id }}" method="POST">
+        <input type="text" class="form-control mb-3 text-center" placeholder="Nhập mã OTP (Giả lập)">
+        <button type="submit" class="btn btn-primary w-100">Xác thực ngay</button>
+    </form>
+</div>
+
+<script>
+    let timeLeft = 120; // 2 phút
+    const timerElement = document.getElementById('timer');
+    const countdown = setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerElement.innerHTML = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            alert("Hết thời gian xác thực!");
+            window.location.href = "/"; // Về dashboard
+        }
+        timeLeft--;
+    }, 1000);
+</script>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - Frade System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .login-card { background: white; padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h3 class="mb-4">Đăng nhập Hệ thống</h3>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-danger py-2 small">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+        <form method="POST">
+            <input type="text" name="username" class="form-control mb-3" placeholder="Tên đăng nhập" required>
+            <input type="password" name="password" class="form-control mb-3" placeholder="Mật khẩu" required>
+            <button type="submit" class="btn btn-primary w-100 py-2">Vào hệ thống</button>
+        </form>
+        <a href="/register" class="d-block mt-3 text-decoration-none text-muted small">Đăng ký tài khoản mới</a>
+    </div>
+</body>
+</html>

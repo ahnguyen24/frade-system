@@ -108,6 +108,7 @@ Content-Type: application/json
     "distance_from_last": 5.0,
     "is_new_device": 1
 }
+### Not included
 ### TC-09: Suspicious New Device Activity (Grey Zone)
 # Giao dịch giá trị vừa phải trên thiết bị mới, khoảng cách ngắn nhưng tần suất bắt đầu tăng.
 POST {{baseUrl}}/analyze-transaction
@@ -119,3 +120,4 @@ Content-Type: application/json
     "distance_from_last": 15.0,
     "is_new_device": 1
 }
+  

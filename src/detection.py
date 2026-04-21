@@ -22,4 +22,4 @@ class FraudDetector:
         
         score = self.model.decision_function(X)[0]
         risk_score = 1 / (1 + math.exp(score * 10)) 
-        return risk_score
+        return risk_score * 10  # Scale to 0-10

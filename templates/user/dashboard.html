@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Frade Pay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar { height: 100vh; background: #212529; color: white; padding-top: 20px; position: fixed; width: 220px; }
+        .nav-link { color: #ced4da; cursor: pointer; padding: 12px 20px; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #0d6efd; color: white; border-radius: 5px; margin: 0 10px; }
+        .main-content { margin-left: 240px; padding: 30px; }
+        .card-balance { background: linear-gradient(45deg, #0d6efd, #0dcaf0); color: white; border: none; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar shadow">
+        <div class="text-center mb-4"><h4>FRADE PAY</h4></div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" onclick="showSection('status')">📊 Tổng quan</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="showSection('transfer')">💸 Chuyển tiền</a></li>
+            <hr class="mx-3">
+            <li class="nav-item"><a class="nav-link text-danger" href="/logout">🚪 Đăng xuất</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        {% if current_user.is_blocked %}
+        <div class="alert alert-danger card p-4 mb-4 border-0 shadow">
+            <h5>⚠️ Tài khoản đang bị tạm khóa</h5>
+            <p>Vui lòng gửi lý do giải trình để ban quản trị xem xét mở lại tài khoản.</p>
+            <form action="/send-complaint" method="POST">
+                <textarea name="reason" class="form-control mb-2" placeholder="Lý do..." required></textarea>
+                <button type="submit" class="btn btn-danger btn-sm">Gửi khiếu nại</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <section id="section-status">
+            <h3 class="mb-4">Chào {{ current_user.username }},</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-balance p-4 shadow-sm">
+                        <small>Số dư tài khoản</small>
+                        <h2 class="fw-bold">{{ "{:,.0f}".format(current_user.balance) }} $</h2>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-4 shadow-sm border-0">
+                        <small class="text-muted">Thông tin liên kết</small>
+                        <h4 class="mt-1">📞 {{ current_user.phone }}</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-transfer" style="display:none;">
+            <h3 class="mb-4">Chuyển tiền nhanh</h3>
+            <div class="card p-4 border-0 shadow-sm" style="max-width: 500px;">
+                <form action="/transfer" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Người nhận</label>
+                        <input type="text" name="receiver" class="form-control" placeholder="Tên người dùng" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số tiền ($)</label>
+                        <input type="number" name="amount" class="form-control" placeholder="0.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Xác nhận mật khẩu</label>
+                        <input type="password" name="password_confirm" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Xác nhận giao dịch</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showSection(id) {
+            document.getElementById('section-status').style.display = 'none';
+            document.getElementById('section-transfer').style.display = 'none';
+            document.getElementById('section-' + id).style.display = 'block';
+            
+            // Cập nhật trạng thái nút
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
